@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pet Marketplace</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      line-height: 1.6;
+    }
+
+    /* Navbar */
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 15px;
+    }
+
+    nav a:hover {
+      color: #ffcc00;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: url("https://images.unsplash.com/photo-1517849845537-4d257902454a") no-repeat center/cover;
+      height: 350px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+    }
+
+    .hero h2 {
+      font-size: 38px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px 25px;
+      border-radius: 12px;
+    }
+
+    /* Marketplace Section */
+    .marketplace {
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .marketplace h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .pets {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .pet-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 250px;
+      text-align: center;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .pet-card:hover {
+      transform: scale(1.05);
+    }
+
+    .pet-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .pet-card h3 {
+      margin: 10px 0 5px;
+    }
+
+    .pet-card p {
+      margin: 5px 0;
+      color: #555;
+    }
+
+    .pet-card button {
+      margin: 10px 0 15px;
+      padding: 10px 15px;
+      border: none;
+      background: #27ae60;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .pet-card button:hover {
+      background: #219150;
+    }
+
+    /* Footer */
+    footer {
+      background: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header>
+    <h1>Pet Market</h1>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Marketplace</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h2>Find Your Perfect Pet 🐾</h2>
+  </section>
+
+  <!-- Marketplace -->
+  <section class="marketplace">
+    <h2>Available Pets</h2>
+    <div class="pets">
+      <div class="pet-card">
+        <img src="https://images.unsplash.com/photo-1593134257782-70a1c7d1c29a" alt="Golden Retriever">
+        <h3>Golden Retriever</h3>
+        <p>Age: 2 years</p>
+        <p>Price: $500</p>
+        <button>Adopt Now</button>
+      </div>
+      <div class="pet-card">
+        <img src="https://images.unsplash.com/photo-1592194996308-7b43878e84a6" alt="Persian Cat">
+        <h3>Persian Cat</h3>
+        <p>Age: 1 year</p>
+        <p>Price: $300</p>
+        <button>Adopt Now</button>
+      </div>
+      <div class="pet-card">
+        <img src="https://images.unsplash.com/photo-1601979035028-5cba9c11f6a9" alt="Parrot">
+        <h3>Parrot</h3>
+        <p>Age: 6 months</p>
+        <p>Price: $150</p>
+        <button>Adopt Now</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Pet Market | Adopt, Don’t Shop 🐶🐱</p>
+  </footer>
+
+</body>
+</html>
