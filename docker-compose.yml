@@ -1,0 +1,214 @@
+version: '3.9'
+
+services:
+  localstack:
+    image: localstack/localstack:3
+    container_name: localstack
+    ports:
+      - '4566:4566'
+      - '4510-4559:4510-4559'
+    environment:
+      - SERVICES=sns,sqs,s3,secretsmanager,ssm,iam,sts
+      - AWS_DEFAULT_REGION=${AWS_REGION}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - 'localstack-data:/var/lib/localstack'
+      - './infra/localstack:/etc/localstack/init/ready.d'
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - '6379:6379'
+
+  otel-collector:
+    image: otel/opentelemetry-collector:0.112.0
+    container_name: otel-collector
+    command: ['--config=/etc/otel-collector-config.yaml']
+    volumes:
+      - './infra/otel/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro'
+    ports:
+      - '4317:4317'
+      - '4318:4318'
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    container_name: jaeger
+    ports:
+      - '16686:16686'
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - '3000:3000'
+    depends_on:
+      - auth-service
+      - cart-service
+      - catalog-service
+      - order-service
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - JWT_SECRET=${JWT_SECRET}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - '8001:8000'
+    depends_on:
+      - localstack
+      - otel-collector
+
+  cart-service:
+    build:
+      context: .
+      dockerfile: services/cart-service/Dockerfile
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - '8002:8000'
+    depends_on:
+      - redis
+      - otel-collector
+
+  catalog-service:
+    build:
+      context: .
+      dockerfile: services/catalog-service/Dockerfile
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+      - LOG_LEVEL=${LOG_LEVEL}
+    ports:
+      - '8003:8000'
+    depends_on:
+      - otel-collector
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: services/inventory-service/Dockerfile
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+      - LOG_LEVEL=${LOG_LEVEL}
+    ports:
+      - '8004:8000'
+    depends_on:
+      - otel-collector
+
+  order-service:
+    build:
+      context: .
+      dockerfile: services/order-service/Dockerfile
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - EVENT_SNS_TOPIC_ARN=${EVENT_SNS_TOPIC_ARN}
+      - EVENT_SQS_QUEUE_URL=${EVENT_SQS_QUEUE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - '8005:8000'
+    depends_on:
+      - localstack
+      - otel-collector
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: services/payment-service/Dockerfile
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - EVENT_SNS_TOPIC_ARN=${EVENT_SNS_TOPIC_ARN}
+      - EVENT_SQS_QUEUE_URL=${EVENT_SQS_QUEUE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - '8006:8000'
+    depends_on:
+      - localstack
+      - otel-collector
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - EVENT_SNS_TOPIC_ARN=${EVENT_SNS_TOPIC_ARN}
+      - EVENT_SQS_QUEUE_URL=${EVENT_SQS_QUEUE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - '8007:8000'
+    depends_on:
+      - localstack
+      - otel-collector
+
+  notification-worker:
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    command: ["python", "app/worker.py"]
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - EVENT_SNS_TOPIC_ARN=${EVENT_SNS_TOPIC_ARN}
+      - EVENT_SQS_QUEUE_URL=${EVENT_SQS_QUEUE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - localstack
+      - otel-collector
+
+volumes:
+  localstack-data:
+  postgres-data:
+

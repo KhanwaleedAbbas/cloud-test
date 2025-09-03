@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-common"
+version = "0.1.0"
+description = "Shared utilities for e-commerce microservices (logging, tracing, auth, aws, events)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "flask>=3.0.0",
+  "pyjwt>=2.8.0",
+  "boto3>=1.34.0",
+  "opentelemetry-api>=1.26.0",
+  "opentelemetry-sdk>=1.26.0",
+  "opentelemetry-instrumentation-flask>=0.47b0",
+  "opentelemetry-exporter-otlp>=1.26.0",
+  "requests>=2.32.0",
+  "redis>=5.0.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

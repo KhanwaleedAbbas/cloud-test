@@ -1,0 +1,11 @@
+name: CD-Placeholder
+
+on:
+  workflow_dispatch:
+
+jobs:
+  info:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "CD will build and push images to ECR, deploy to ECS, and run Terraform. To be implemented."
+

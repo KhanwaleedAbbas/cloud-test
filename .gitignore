@@ -1,0 +1,32 @@
+# General
+.DS_Store
+.env
+.env.*
+*.log
+dist/
+build/
+coverage/
+node_modules/
+
+# Python
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+*.pyc
+*.pyo
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate*
+
+# Docker
+*.pid
+.dccache/
+
+# Next.js
+.next/
+out/
+
